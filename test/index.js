@@ -785,6 +785,7 @@ describe('decoding (uint[][3], uint)', function () {
     assert.equal(a[0][1][1].toString(10), 4)
     assert.equal(a[0][2][0].toString(10), 5)
     assert.equal(a[0][2][1].toString(10), 6)
+    console.log(a[1].toString(10))
   })
 })
 
@@ -826,7 +827,7 @@ describe('encoding using ABI Json (int256)', function () {
   })
 })
 
-describe('encoding using ABI Json (string)', function () {
+describe('encoding and decoding using ABI Json (string)', function () {
   it('should work', function () {
     var json_abi = [
       {
@@ -914,7 +915,7 @@ describe('encoding using ABI Json (string)', function () {
   })
 })
 
-describe('encoding using ABI Json (int256,string,bytes8)', function () {
+describe('encoding and decoding using ABI Json (int256,string,bytes8)', function () {
   it('should work', function () {
     var json_abi = [
       {
@@ -995,7 +996,25 @@ describe('encoding using ABI Json (int256,string,bytes8)', function () {
         'type': 'function'
       }
     ]
+
+    console.log(JSON.stringify(json_abi))
     var encoded = abi.encode(json_abi, 'setABC', [12, 'salam', [1, 2, 3, 4, 5, 6, 7, 8]])
     assert.equal(encoded.toString('hex'), 'f77a13e1000000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000600102030405060708000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000573616c616d000000000000000000000000000000000000000000000000000000')
+    var types = abi.makeTypeList(json_abi, 'setABC')
+    console.log(types)
+    var decoded = abi.decode(json_abi, 'setABC', 'f77a13e1000000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000600102030405060708000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000573616c616d000000000000000000000000000000000000000000000000000000')
+    assert.equal(decoded[0].type, 'int256')
+    assert.equal(decoded[0].value, 12)
+    assert.equal(decoded[1].type, 'string')
+    assert.equal(decoded[1].value, 'salam')
+    assert.equal(decoded[2].type, 'bytes8')
+    assert.equal(decoded[2].value[0], 1)
+    assert.equal(decoded[2].value[1], 2)
+    assert.equal(decoded[2].value[2], 3)
+    assert.equal(decoded[2].value[3], 4)
+    assert.equal(decoded[2].value[4], 5)
+    assert.equal(decoded[2].value[5], 6)
+    assert.equal(decoded[2].value[6], 7)
+    assert.equal(decoded[2].value[7], 8)
   })
 })
